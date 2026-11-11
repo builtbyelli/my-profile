@@ -43,6 +43,20 @@ jobs:
           --dart-define="CMS_URL=${{ vars.CMS_URL }}"
           --dart-define="SANITY_PROJECT_ID=${{ vars.SANITY_PROJECT_ID }}"
           --dart-define="SANITY_DATASET=${{ vars.SANITY_DATASET }}"
+      
+      - name: Check OMDb API key exposure
+        shell: bash
+        env:
+          OMDB_KEY: ${{ secrets.OMDB_KEY }}
+        run: |
+          if [ -z "$OMDB_KEY" ]; then
+            echo "OMDb key is not configured."
+            exit 1
+          fi
+
+          echo "Checking compiled JavaScript..."
+          echo "Number of matching lines:"
+          grep -F -c -- "$OMDB_KEY" build/web/main.dart.js || true
 
       - name: Configure GitHub Pages
         uses: actions/configure-pages@v5
